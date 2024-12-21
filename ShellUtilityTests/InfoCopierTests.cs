@@ -14,7 +14,7 @@ namespace ShellUtilityTests
             var retVal = InfoCopier.SetClipboard(testDirectory.FullName, CopyAction.UNIX);
             var clipboardText = TextCopy.ClipboardService.GetText();
             Assert.IsTrue(retVal == 0);
-            Assert.IsTrue(clipboardText.StartsWith("/D/"));
+            Assert.IsTrue(clipboardText.StartsWith("/C/"));
             Assert.IsTrue(clipboardText.EndsWith("/data"));
         }
         [TestMethod]
@@ -24,7 +24,7 @@ namespace ShellUtilityTests
             var retVal = InfoCopier.SetClipboard(testFile.FullName, CopyAction.UNIX);
             var clipboardText = TextCopy.ClipboardService.GetText();
             Assert.IsTrue(retVal == 0);
-            Assert.IsTrue(clipboardText.StartsWith("/D/"));
+            Assert.IsTrue(clipboardText.StartsWith("/C/"));
             Assert.IsTrue(clipboardText.EndsWith("/text_file.txt"));
         }
         [DataTestMethod]
@@ -39,11 +39,15 @@ namespace ShellUtilityTests
         [DataRow(@"data\encoding_test_file_utf-32BE.txt")]
         [DataRow(@"data\encoding_test_file_iso-8859-1.txt")]
         [DataRow(@"data\encoding_test_file_utf-7.txt")]
+        [DataRow(@"data\encoding_test_file_utf-16_null.txt")]
         public void IsProbablyText_True(string filePath)
         {
-            var testFile = new FileInfo(filePath);
-            var isText = InfoCopier.IsProbablyText(testFile);
-            Assert.IsTrue(isText);
+            using (var byteReader = new BinaryReader(new FileInfo(filePath).OpenRead()))
+            {
+                var allBytes = byteReader.ReadBytes((int)byteReader.BaseStream.Length);
+                var isText = InfoCopier.IsProbablyText(allBytes);
+                Assert.IsTrue(isText);
+            }
         }
         [DataTestMethod]
         [DataRow(@"data\banana-cheerer.gif")]
@@ -52,9 +56,12 @@ namespace ShellUtilityTests
         [DataRow(@"data\SS64.com - CMD_Index.pdf")]
         public void IsProbablyText_False(string filePath)
         {
-            var testFile = new FileInfo(filePath);
-            var isText = InfoCopier.IsProbablyText(testFile);
-            Assert.IsFalse(isText);
+            using (var byteReader = new BinaryReader(new FileInfo(filePath).OpenRead()))
+            {
+                var allBytes = byteReader.ReadBytes((int)byteReader.BaseStream.Length);
+                var isText = InfoCopier.IsProbablyText(allBytes);
+                Assert.IsFalse(isText);
+            }
         }
     }
 }
