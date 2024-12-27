@@ -14,7 +14,7 @@ namespace ShellUtilityTests
             var retVal = InfoCopier.SetClipboard(testDirectory.FullName, CopyAction.UNIX);
             var clipboardText = TextCopy.ClipboardService.GetText();
             Assert.IsTrue(retVal == 0);
-            Assert.IsTrue(clipboardText.StartsWith("/C/"));
+            Assert.IsTrue(clipboardText.StartsWith("/D/"));
             Assert.IsTrue(clipboardText.EndsWith("/data"));
         }
         [TestMethod]
@@ -24,7 +24,7 @@ namespace ShellUtilityTests
             var retVal = InfoCopier.SetClipboard(testFile.FullName, CopyAction.UNIX);
             var clipboardText = TextCopy.ClipboardService.GetText();
             Assert.IsTrue(retVal == 0);
-            Assert.IsTrue(clipboardText.StartsWith("/C/"));
+            Assert.IsTrue(clipboardText.StartsWith("/D/"));
             Assert.IsTrue(clipboardText.EndsWith("/text_file.txt"));
         }
         [DataTestMethod]
